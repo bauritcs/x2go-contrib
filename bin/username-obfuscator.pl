@@ -71,3 +71,121 @@ if (length ($ret) < $base36digits) {
 }
 
 print $ret . "\n";
+
+exit (0);
+
+__END__
+
+=head1 NAME
+
+username-obfuscator.pl - Obfuscates username via OTP input
+
+=head1 SYNOPSIS
+
+=over
+
+=item B<username-obfuscator.pl> B<--help>|B<-h>|B<-?>
+
+=item B<username-obfuscator.pl> B<--man>
+
+=item B<username-obfuscator.pl> I<USERNAME> I<OTP>
+
+=back
+
+=head1 DESCRIPTION
+
+B<username-obfuscator.pl> takes a user name as its first operand (I<USERNAME>)
+and an OTP (I<OTP>) as its second operand.
+
+The user name will be mangled by using a (bitwise) exclusive or (I<XOR>)
+operation on each character of the input arguments.
+
+To make sure, that the resulting data is an alphanumeric string, it is then
+encoded through base36 and printed to the standard output.
+
+=head2 ABOUT THE OTP
+
+Internally, the provided OTP is mangled so that it matches the provided user
+name in length, if that is not already the case.
+
+=over
+
+=item *
+
+If the I<OTP> length matches the I<USERNAME> length, nothing is modified.
+
+This is the best-case scenario and users are encouraged to use length-matching
+arguments.
+
+Example: B<username-obfuscator.pl> I<'user'> I<'name'>
+
+Resulting OTP: I<'name'>
+
+=item *
+
+If the I<OTP> is longer than the provided I<USERNAME>, it is truncated to match
+the user name's length.
+
+This operation is rather safe, since additional information
+is just discarded and the entropy provided by the user for user name mangling
+is preserved.
+
+Example: B<username-obfuscator.pl> I<'usr'> I<'name'>
+
+Resulting OTP: I<'nam'>
+
+=item *
+
+If the I<OTP> is shorter than the provided I<USERNAME>, it is repeated as long
+as it takes to match the provided user name's length.
+
+This operation is risky, but the best thing we can do in this case. Avoid OTP
+lengths less than the length of the user name string at any cost.
+
+Example: B<username-obfuscator.pl> I<'veryveryveryverylongusername'> I<'shortotp'>
+
+Resulting OTP: I<'shortotpshortotpshortotpshor'>
+
+=back
+
+=head2 WARNING
+
+This obfuscator is neither cryptographically secure, nor is it meant to be:
+
+=over
+
+=item *
+
+The base36 encoding can be easily reversed.
+
+=item *
+
+Known-plaintext attacks can trivially return the OTP used for obfuscation.
+
+=item *
+
+Linguistic attacks are made difficult by choosing a proper OTP, but not
+impossible.
+
+=back
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>|B<-h>|B<-?>
+
+Print a brief help message and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 AUTHOR
+
+This manual has been written by L<Mihai Moldovan|mailto:ionic@ionic.de> for
+L<the X2Go project|https://www.x2go.org>.
+
+=cut
