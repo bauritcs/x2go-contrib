@@ -43,7 +43,8 @@ my $otp = $ARGV[1];
 
 if (length ($otp) > length ($in)) {
 	$otp = substr ($otp, 0, length ($in));
-} elsif (length ($otp) < length ($in)) {
+}
+elsif (length ($otp) < length ($in)) {
 	$otp = $otp x (length ($in) / length ($otp));
 	my $rem = (length ($in) % length ($otp));
 	$otp = $otp . substr ($otp, 0, $rem);
