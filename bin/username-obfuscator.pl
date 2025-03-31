@@ -27,15 +27,16 @@ use Pod::Usage;
 use POSIX;
 use Math::BigInt;
 
-Getopt::Long::Configure("gnu_getopt", "no_auto_abbrev");
+Getopt::Long::Configure ("gnu_getopt", "no_auto_abbrev");
 
 my $help = 0;
 my $man = 0;
 
-GetOptions('help|?|h' => \$help, 'man' => \$man) or pod2usage(-output => \*STDERR, -exitval => 2);
+GetOptions ('help|?|h' => \$help,
+            'man' => \$man) or pod2usage (-output => \*STDERR, -exitval => 2);
 
-pod2usage(-output => \*STDERR, -exitval => 1) if $help;
-pod2usage(-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
+pod2usage (-output => \*STDERR, -exitval => 1) if $help;
+pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
 
 my $in = $ARGV[0];
 my $otp = $ARGV[1];
