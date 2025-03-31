@@ -4,8 +4,20 @@ use strict;
 use warnings;
 use diagnostics;
 
+use Getopt::Long;
+use Pod::Usage;
 use POSIX;
 use Math::BigInt;
+
+Getopt::Long::Configure("gnu_getopt", "no_auto_abbrev");
+
+my $help = 0;
+my $man = 0;
+
+GetOptions('help|?|h' => \$help, 'man' => \$man) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2, -exitval => 0) if $man;
 
 my $in = $ARGV[0];
 my $otp = $ARGV[1];
