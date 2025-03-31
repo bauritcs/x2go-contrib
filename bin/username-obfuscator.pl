@@ -27,7 +27,7 @@ use Pod::Usage;
 use POSIX;
 use Math::BigInt;
 
-Getopt::Long::Configure ("gnu_getopt", "no_auto_abbrev");
+Getopt::Long::Configure ('gnu_getopt', 'no_auto_abbrev');
 
 my $help = 0;
 my $man = 0;
