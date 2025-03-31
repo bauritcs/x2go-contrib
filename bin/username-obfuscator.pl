@@ -2,6 +2,7 @@
 
 use POSIX;
 use Math::BigInt;
+
 my $in = $ARGV[0];
 my $otp = $ARGV[1];
 
@@ -13,8 +14,8 @@ if (length ($otp) > length ($in)) {
 	$otp = $otp . substr ($otp, 0, $rem);
 }
 
-my @in = split ("", $in);
-my @otp = split ("", $otp);
+my @in = split ('', $in);
+my @otp = split ('', $otp);
 my $base36digits = ceil ((length ($in) * log (256)) / log (36));
 my $base36num = Math::BigInt->new (0);
 my $i = 0;
