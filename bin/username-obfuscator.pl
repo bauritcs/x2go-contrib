@@ -40,6 +40,12 @@ pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
 
 my ($username, $otp) = @ARGV;
 
+pod2usage (-message => 'Expected user name as first argument.',
+           -output => \*STDERR, -exitval => 3) if (not defined ($username));
+
+pod2usage (-message => 'Expected OTP as second argument.',
+           -output => \*STDERR, -exitval => 4) if (not defined ($otp));
+
 if (length ($otp) > length ($username)) {
 	$otp = substr ($otp, 0, length ($username));
 }
