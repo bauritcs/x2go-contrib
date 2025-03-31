@@ -60,7 +60,7 @@ while (@in) {
 	my $xor_res = ord (shift (@in)) ^ ord (shift (@otp));
 	if ($i) {
 		$base36num->blsft (8);
-	};
+	}
 	$base36num->badd ($xor_res);
 	++$i;
 }
