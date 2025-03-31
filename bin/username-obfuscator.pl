@@ -38,26 +38,25 @@ GetOptions ('help|?|h' => \$help,
 pod2usage (-output => \*STDERR, -exitval => 1) if $help;
 pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
 
-my $in = $ARGV[0];
-my $otp = $ARGV[1];
+my ($username, $otp) = @ARGV;
 
-if (length ($otp) > length ($in)) {
-	$otp = substr ($otp, 0, length ($in));
+if (length ($otp) > length ($username)) {
+	$otp = substr ($otp, 0, length ($username));
 }
-elsif (length ($otp) < length ($in)) {
-	$otp = $otp x (length ($in) / length ($otp));
-	my $rem = (length ($in) % length ($otp));
+elsif (length ($otp) < length ($username)) {
+	$otp = $otp x (length ($username) / length ($otp));
+	my $rem = (length ($username) % length ($otp));
 	$otp = $otp . substr ($otp, 0, $rem);
 }
 
-my @in = split ('', $in);
+my @username = split ('', $username);
 my @otp = split ('', $otp);
-my $base36digits = ceil ((length ($in) * log (256)) / log (36));
+my $base36digits = ceil ((length ($username) * log (256)) / log (36));
 my $base36num = Math::BigInt->new (0);
 my $i = 0;
 
-while (@in) {
-	my $xor_res = ord (shift (@in)) ^ ord (shift (@otp));
+while (@username) {
+	my $xor_res = ord (shift (@username)) ^ ord (shift (@otp));
 	if ($i) {
 		$base36num->blsft (8);
 	}
