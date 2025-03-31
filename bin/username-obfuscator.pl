@@ -3,9 +3,9 @@
 use POSIX;
 use Math::BigInt;
 my $in = $ARGV[0];
-my $otp = $ARGV[1]; 
+my $otp = $ARGV[1];
 
-if (length ($otp) > length ($in)) { 
+if (length ($otp) > length ($in)) {
 	$otp = substr ($otp, 0, length ($in));
 } elsif (length ($otp) < length ($in)) {
 	$otp = $otp x (length ($in) / length ($otp));
@@ -13,7 +13,7 @@ if (length ($otp) > length ($in)) {
 	$otp = $otp . substr ($otp, 0, $rem);
 }
 
-my @in = split ("", $in); 
+my @in = split ("", $in);
 my @otp = split ("", $otp);
 my $base36digits = ceil ((length ($in) * log (256)) / log (36));
 my $base36num = Math::BigInt->new (0);
@@ -32,4 +32,5 @@ my $ret = $base36num->to_base (36);
 if (length ($ret) < $base36digits) {
 	$ret = "0" x ($base36digits - length ($ret)) . $ret;
 }
+
 print $ret . "\n";
