@@ -1,5 +1,6 @@
 #!/usr/bin/perl -T
 
+use strict;
 use warnings;
 use diagnostics;
 use POSIX;
