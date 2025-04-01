@@ -108,6 +108,9 @@ my $ret = $base36num->to_base (36);
 # strictly speaking, uppercase characters are also legit.
 $ret = lc ($ret);
 
+# Drop leading zeros.
+$ret =~ s/^0*(.*)$/$1/;
+
 print $ret . "\n";
 
 exit (0);
