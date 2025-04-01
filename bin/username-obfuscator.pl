@@ -74,6 +74,7 @@ elsif (length ($otp) < length ($username)) {
 	$otp = $otp . substr ($otp, 0, $rem);
 }
 
+# Split input into individual characters for easy handling.
 my @username_chrs = split ('', $username);
 my @otp_chrs = split ('', $otp);
 my $base36digits = ceil ((length ($username) * log (256)) / log (36));
