@@ -83,15 +83,14 @@ my @username_chrs = split ('', $username);
 my @otp_chrs = split ('', $otp);
 
 my $base36num = Math::BigInt->new (0);
-my $shiftit = 0;
 
 while (@username_chrs) {
 	my $xor_res = ord (shift (@username_chrs)) ^ ord (shift (@otp_chrs));
-	if ($shiftit) {
+
+	if (0 != $base36num) {
 		$base36num->blsft (8);
 	}
 	$base36num->badd ($xor_res);
-	$shiftit = 1;
 }
 
 my $ret = $base36num->to_base (36);
