@@ -101,6 +101,7 @@ while (@username_chrs) {
 	$base36num->badd ($xor_res);
 }
 
+# Convert to base36.
 my $ret = $base36num->to_base (36);
 
 print $ret . "\n";
