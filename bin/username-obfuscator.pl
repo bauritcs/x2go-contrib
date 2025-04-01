@@ -84,12 +84,20 @@ my @otp_chrs = split ('', $otp);
 
 my $base36num = Math::BigInt->new (0);
 
+# Loop through all the characters in the user name string and ...
 while (@username_chrs) {
+	# ... convert each character to its ordinal (ASCII) value, XORing them
+	# with each character of the OTP ...
 	my $xor_res = ord (shift (@username_chrs)) ^ ord (shift (@otp_chrs));
 
 	if (0 != $base36num) {
+		# Shift temporary result number up eight bits (i.e., a byte...
+		# hopefully...) if it isn't "empty", i.e., zero.
 		$base36num->blsft (8);
 	}
+
+	# ... and finally add the XOR'd result to the lowest 8 bits of the
+	# temporary number.
 	$base36num->badd ($xor_res);
 }
 
