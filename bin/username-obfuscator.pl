@@ -55,14 +55,14 @@ elsif (length ($otp) < length ($username)) {
 	$otp = $otp . substr ($otp, 0, $rem);
 }
 
-my @username = split ('', $username);
-my @otp = split ('', $otp);
+my @username_chrs = split ('', $username);
+my @otp_chrs = split ('', $otp);
 my $base36digits = ceil ((length ($username) * log (256)) / log (36));
 my $base36num = Math::BigInt->new (0);
 my $i = 0;
 
-while (@username) {
-	my $xor_res = ord (shift (@username)) ^ ord (shift (@otp));
+while (@username_chrs) {
+	my $xor_res = ord (shift (@username_chrs)) ^ ord (shift (@otp_chrs));
 	if ($i) {
 		$base36num->blsft (8);
 	}
