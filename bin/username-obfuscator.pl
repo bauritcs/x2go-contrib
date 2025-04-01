@@ -43,8 +43,12 @@ my ($username, $otp) = @ARGV;
 pod2usage (-message => 'Expected user name as first argument.',
 	   -output => \*STDERR, -exitval => 3) if (not defined ($username));
 
+pod2usage (-message => 'User name does not look legal.',
+	   -output => \*STDERR,
+	   -exitval => 4) unless $username =~ /^[a-zA-Z_][-a-zA-Z0-9_.]*$/;
+
 pod2usage (-message => 'Expected OTP as second argument.',
-	   -output => \*STDERR, -exitval => 4) if (not defined ($otp));
+	   -output => \*STDERR, -exitval => 5) if (not defined ($otp));
 
 # Make sure that OTP length is the same as the user name length.
 if (length ($otp) > length ($username)) {
