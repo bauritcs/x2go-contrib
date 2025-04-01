@@ -47,9 +47,17 @@ pod2usage (-message => 'Expected OTP as second argument.',
            -output => \*STDERR, -exitval => 4) if (not defined ($otp));
 
 if (length ($otp) > length ($username)) {
+	print STDERR 'OTP longer than user name, truncating it to the user ' .
+		     'name\'s length.' . "\n";
 	$otp = substr ($otp, 0, length ($username));
 }
 elsif (length ($otp) < length ($username)) {
+	print STDERR 'OTP shorter than the user name! This is unsafe!' . "\n" .
+		     'The OTP will be repeated as many times as necessary ' .
+		     'to match the user name\'s length.' . "\n" .
+		     'Please consider using an OTP that is at least as ' .
+		     'long as the user name!' . "\n";
+
 	$otp = $otp x (length ($username) / length ($otp));
 	my $rem = (length ($username) % length ($otp));
 	$otp = $otp . substr ($otp, 0, $rem);
