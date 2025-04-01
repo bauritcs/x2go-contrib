@@ -104,6 +104,10 @@ while (@username_chrs) {
 # Convert to base36.
 my $ret = $base36num->to_base (36);
 
+# Convert to lowercase, which is better suited to UNIX user names, although
+# strictly speaking, uppercase characters are also legit.
+$ret = lc ($ret);
+
 print $ret . "\n";
 
 exit (0);
