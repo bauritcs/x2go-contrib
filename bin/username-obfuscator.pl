@@ -46,6 +46,7 @@ pod2usage (-message => 'Expected user name as first argument.',
 pod2usage (-message => 'Expected OTP as second argument.',
            -output => \*STDERR, -exitval => 4) if (not defined ($otp));
 
+# Make sure that OTP length is the same as the user name length.
 if (length ($otp) > length ($username)) {
 	print STDERR 'OTP longer than user name, truncating it to the user ' .
 		     'name\'s length.' . "\n";
@@ -58,7 +59,17 @@ elsif (length ($otp) < length ($username)) {
 		     'Please consider using an OTP that is at least as ' .
 		     'long as the user name!' . "\n";
 
+	# Fully repeat it as many times as necessary.
 	$otp = $otp x (length ($username) / length ($otp));
+
+	# If the user name is still longer, copy as many characters from the
+	# beginning of the OTP to the end so that string sizes match up.
+	# Example: (brackets to show which part of the user name and OTP match
+	#           up in length)
+	#          [abc]defgh [xyz] will lead to the OTP being repeated twice,
+	#          so we now have [abcdef]gh [xyzxyz], but still need to
+	#          repeat two other characters to cover all user name
+	#          characters, so we end up with [abcdefgh] [xyzxyzxy].
 	my $rem = (length ($username) % length ($otp));
 	$otp = $otp . substr ($otp, 0, $rem);
 }
