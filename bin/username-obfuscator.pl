@@ -81,7 +81,7 @@ elsif (length ($otp) < length ($username)) {
 # Split input into individual characters for easy handling.
 my @username_chrs = split ('', $username);
 my @otp_chrs = split ('', $otp);
-my $base36digits = ceil ((length ($username) * log (256)) / log (36));
+
 my $base36num = Math::BigInt->new (0);
 my $i = 0;
 
@@ -95,9 +95,6 @@ while (@username_chrs) {
 }
 
 my $ret = $base36num->to_base (36);
-if (length ($ret) < $base36digits) {
-	$ret = "0" x ($base36digits - length ($ret)) . $ret;
-}
 
 print $ret . "\n";
 
