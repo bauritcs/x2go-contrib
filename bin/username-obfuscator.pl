@@ -33,7 +33,7 @@ my $help = 0;
 my $man = 0;
 
 GetOptions ('help|?|h' => \$help,
-            'man' => \$man) or pod2usage (-output => \*STDERR, -exitval => 2);
+	    'man' => \$man) or pod2usage (-output => \*STDERR, -exitval => 2);
 
 pod2usage (-output => \*STDERR, -exitval => 1) if $help;
 pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
@@ -41,10 +41,10 @@ pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
 my ($username, $otp) = @ARGV;
 
 pod2usage (-message => 'Expected user name as first argument.',
-           -output => \*STDERR, -exitval => 3) if (not defined ($username));
+	   -output => \*STDERR, -exitval => 3) if (not defined ($username));
 
 pod2usage (-message => 'Expected OTP as second argument.',
-           -output => \*STDERR, -exitval => 4) if (not defined ($otp));
+	   -output => \*STDERR, -exitval => 4) if (not defined ($otp));
 
 # Make sure that OTP length is the same as the user name length.
 if (length ($otp) > length ($username)) {
