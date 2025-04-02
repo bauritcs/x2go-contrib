@@ -162,7 +162,9 @@ The user name will be mangled by using a (bitwise) exclusive or (I<XOR>)
 operation on each character of the input arguments.
 
 To make sure, that the resulting data is an alphanumeric string, it is then
-encoded through base36 and printed to the standard output.
+encoded through base36, converted to lowercase, potentially further mangled in
+order to attain proper UNIX user name semantics, and printed to the standard
+output.
 
 =head2 ABOUT THE OTP
 
