@@ -1,7 +1,7 @@
 #!/usr/bin/perl -T
 
 #############################################################################
-# username-obfuscator.pl - transforms usernames via OTP and outputs base36. #
+# username-obfuscator.pl - UNIX user name obfuscator using OTP and base36.  #
 # Copyright (C) 2025  Mihai Moldovan <ionic@ionic.de>                       #
 #                                                                           #
 # This program is free software: you can redistribute it and/or modify      #
