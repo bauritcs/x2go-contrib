@@ -111,6 +111,20 @@ $ret = lc ($ret);
 # Drop leading zeros.
 $ret =~ s/^0*(.*)$/$1/;
 
+# If the result starts with digits, transpose them with the first alphanumeric
+# or underscore character.
+# UNIX user names are typically not allowed to start with either digits,
+# dashes or dots, so we want to make sure that these characters are not part
+# of the start.
+# We still want to keep the characters in the string, but transpose the first
+# "legal" starting character to the front.
+# Note that this breaks the whole base36 scheme and decoding such a string
+# will not be possible.
+# Also note that this could be simplified to just s/^([0-9]*)(.)(.*)$/$2$1$3/
+# because the base36 result cannot include either dashes, dots or underscores,
+# but it's good to be more generic to showcase what we're actually after.
+$ret =~ s/^([0-9]*)([.-]*)([a-z_])(.*)$/$3$1$2$4/;
+
 print $ret . "\n";
 
 exit (0);
