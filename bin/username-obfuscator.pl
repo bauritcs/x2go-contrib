@@ -125,6 +125,12 @@ $ret =~ s/^0*(.*)$/$1/;
 # but it's good to be more generic to showcase what we're actually after.
 $ret =~ s/^([0-9]*)([.-]*)([a-z_])(.*)$/$3$1$2$4/;
 
+# Lastly, if the result contains only digits, add an underscore to make it a
+# legit UNIX user name (hopefully).
+if ($ret =~ /^[0-9]+$/) {
+	$ret = '_' . $ret;
+}
+
 print $ret . "\n";
 
 exit (0);
