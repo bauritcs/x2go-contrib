@@ -246,6 +246,21 @@ Prints the manual page and exits.
 
 =back
 
+=head1 RETURN
+
+First and foremost, this utility shall print a valid UNIX user name to stdout
+and return a value of zero, unless an error occurred or the B<--man> option has
+been used.
+
+Errors are indicated by non-zero return values.
+
+If the B<--man> option was specified, the whole man page is printed to stderr
+and the program returns a value of zero.
+
+While base36 is used internally to obfuscate the input user name, the returned
+obfuscated user name is not guaranteed to be valid base36 input - not even
+after converting it to uppercase characters.
+
 =head1 AUTHOR
 
 This manual has been written by L<Mihai Moldovan|mailto:ionic@ionic.de> for
