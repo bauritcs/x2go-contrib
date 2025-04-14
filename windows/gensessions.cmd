@@ -105,6 +105,8 @@ IF NOT EXIST "%~dp0\session-template" (
 		for /f "delims=" %%i in ('type "%~dp0\session-template" ^& break ^> "%USERPROFILE%\.x2goclient\sessions" ') do (
 			set "myline=%%i"
 			set escup=%USERPROFILE:\=\\%
+			set iconpath=%~dp0\icons:\=/%
+			call set "myline=!myline:INSERTICONPATH=%%iconpath%%!"
 			call set "myline=!myline:INSERTUSERPROFILE=%%escup%%!"
 			call set "myline=!myline:INSERTUSERNAME=%%REMOTEUSERNAME%%!"
 			echo !myline! >>"%USERPROFILE%\.x2goclient\sessions" 
