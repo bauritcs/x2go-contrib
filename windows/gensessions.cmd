@@ -50,7 +50,7 @@ REM number to that, say, 25, so he might be user1075@x2go.example.com in your
 REM X2Go environment.
 REM
 
-IF NOT EXIST "%~dp0\session-template" (
+IF NOT EXIST "%~dp0\config\session-template" (
 	IF NOT EXIST "%USERPROFILE%\.x2goclient\sessions" (
 		echo "ERROR: No session template and no previous session config. Unable to continue."
 		exit /b 1
@@ -62,22 +62,22 @@ IF NOT EXIST "%~dp0\session-template" (
 ) ELSE (
 	REM TODO add code to switch between otpstring, usermap or plain local user
 	REM EITHER call the obfuscator script here - note that this requires a perl interpreter in your path
-	IF EXIST "%~dp0\otpstring" (
+	IF EXIST "%~dp0\config\otpstring" (
 		REM load the OTPSTRING from the file
-		for /f "tokens=1" %%f in ("%~dp0\otpstring") do set OTPSTRING=%%f
+		for /f "tokens=1" %%f in ("%~dp0\config\otpstring") do set OTPSTRING=%%f
 		for /f "tokens=1" %%g in ('perl .\username-obfuscator.pl %USERNAME%' %OTPSTRING%) do set REMOTEUSERNAME=%%g
 	) ELSE (
-		echo "ERROR: No otpstring file found in folder "%~dp0". Unable to continue."
+		echo "ERROR: No otpstring file found in folder "%~dp0\config". Unable to continue."
 		exit /b 1
 	)
 	REM OR read the remote user name from a file that performs static mapping, like so:
-	IF EXIST "%~dp0\usermap" (
+	IF EXIST "%~dp0\config\usermap" (
 		REM NOTE: if you have disabled fast user switching, you can skip this line and hard-code ENTRYNUM=1
 		for /f "delims=: tokens=1" %%g in ('reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\ /s ^| findstr /i "LoggedOnSAMUser" ^| findstr /i /n "%COMPUTERNAME%\%USERNAME%"') do set ENTRYNUM=%%g
 		REM fetch SID string from matching entry
 		for /f "tokens=3" %%i in ('reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\%ENTRYNUM%\ /v LoggedOnUserSID') do set NUMUID="%%i
 		REM scan usermap file for a matching SID
-		for /f "tokens=1,2" %%m in ("%~dp0\usermap") do (
+		for /f "tokens=1,2" %%m in ("%~dp0\config\usermap") do (
 			REM once we have a match, set our REMOTEUSERNAME variable and exit the for loop
 			IF "%%m" equ "%%NUMID%%" (
 				set REMOTEUSERNAME=%%n
@@ -86,7 +86,7 @@ IF NOT EXIST "%~dp0\session-template" (
 		)
 		IF
 	) ELSE (
-		echo "ERROR: No usermap file found in folder "%~dp0". Unable to continue."
+		echo "ERROR: No usermap file found in folder "%~dp0\config". Unable to continue."
 		exit /b 1
 	)
 	REM if you do not wish to do either, uncomment the line below to default 
@@ -102,7 +102,7 @@ IF NOT EXIST "%~dp0\session-template" (
 		REM
 
 		setlocal ENABLEDELAYEDEXPANSION
-		for /f "delims=" %%i in ('type "%~dp0\session-template" ^& break ^> "%USERPROFILE%\.x2goclient\sessions" ') do (
+		for /f "delims=" %%i in ('type "%~dp0\config\session-template" ^& break ^> "%USERPROFILE%\.x2goclient\sessions" ') do (
 			set "myline=%%i"
 			set escup=%USERPROFILE:\=\\%
 			set iconpath=%~dp0\icons:\=/%
