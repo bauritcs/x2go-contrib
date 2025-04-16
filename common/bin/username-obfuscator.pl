@@ -31,9 +31,11 @@ Getopt::Long::Configure ('gnu_getopt', 'no_auto_abbrev');
 
 my $help = 0;
 my $man = 0;
+my $prefix = undef;
 
 GetOptions ('help|?|h' => \$help,
-	    'man' => \$man) or pod2usage (-output => \*STDERR, -exitval => 2);
+	    'man' => \$man,
+	    'prefix|p=s' => \$prefix) or pod2usage (-output => \*STDERR, -exitval => 2);
 
 pod2usage (-output => \*STDERR, -exitval => 1) if $help;
 pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
@@ -51,6 +53,15 @@ pod2usage (-message => 'User name does not look legal.',
 
 pod2usage (-message => 'Expected OTP as second argument.',
 	   -output => \*STDERR, -exitval => 5) if (not defined ($otp));
+
+pod2usage (-message => 'No prefix provided.',
+	   -output => \*STDERR, -exitval => 6) if ((defined ($prefix)) && ('' eq $prefix));
+
+## no critic (RegularExpressions::RequireLineBoundaryMatching)
+pod2usage (-message => 'Prefix does not look legal.',
+	   -output => \*STDERR,
+	   -exitval => 7) if ((defined ($prefix)) && ($prefix !~ /^[[:alnum:]_][-[:alnum:]_.]*$/xs));
+## use critic
 
 # Make sure that OTP length is the same as the user name length.
 if (length ($otp) > length ($username)) {
@@ -113,19 +124,27 @@ $ret = lc ($ret);
 # Drop leading zeros.
 $ret =~ s/^0*(.*)$/$1/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 
-# If the result starts with digits, transpose them with the first alphanumeric
-# or underscore character.
-# UNIX user names are typically not allowed to start with either digits,
-# dashes or dots, so we want to make sure that these characters are not part
-# of the start.
-# We still want to keep the characters in the string, but transpose the first
-# "legal" starting character to the front.
-# Note that this breaks the whole base36 scheme and decoding such a string
-# will not be possible.
-# Also note that this could be simplified to just s/^([0-9]*)(.)(.*)$/$2$1$3/
-# because the base36 result cannot include either dashes, dots or underscores,
-# but it's good to be more generic to showcase what we're actually after.
-$ret =~ s/^(\d*)([.-]*)([[:lower:]_])(.*)$/$3$1$2$4/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
+if (defined ($prefix)) {
+	$ret = $prefix . $ret;
+}
+
+if ($ret =~ m/^[-\d.]/sx) { ## no critic (RegularExpressions::RequireLineBoundaryMatching)
+	# If the result starts with digits, transpose them with the first
+	# alphanumeric or underscore character.
+	# UNIX user names are typically not allowed to start with either
+	# digits, dashes or dots, so we want to make sure that these
+	# characters are not part of the start.
+	# We still want to keep the characters in the string, but transpose
+	# the first "legal" starting character to the front.
+	# Note that this breaks the whole base36 scheme and decoding such a
+	# string will not be possible, unless we've prepended a prefix and it
+	# turns out that we only need to transpose (part of) the prefix.
+	# Also note that this could be simplified to just
+	# s/^(\d*)(.)(.*)$/$2$1$3/sx because the base36 result cannot include
+	# either dashes, dots or underscores, but it's good to be more
+	# specific to showcase what we're actually after.
+	$ret =~ s/^([-\d.]*)([[:lower:]_])(.*)$/$2$1$3/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
+}
 
 # Lastly, if the result contains only digits, add an underscore to make it a
 # legit UNIX user name (hopefully).
@@ -151,22 +170,26 @@ username-obfuscator.pl - Obfuscates username via OTP input
 
 =item B<username-obfuscator.pl> B<--man>
 
-=item B<username-obfuscator.pl> I<USERNAME> I<OTP>
+=item B<username-obfuscator.pl> [B<--prefix>|B<-p> I<PREFIX>] I<USERNAME> I<OTP>
 
 =back
 
 =head1 DESCRIPTION
 
 B<username-obfuscator.pl> takes a user name as its first operand (I<USERNAME>)
-and an OTP (I<OTP>) as its second operand.
+and an OTP (I<OTP>) as its second operand. Optionally, you may specify a prefix
+(I<PREFIX>) to be prepended to the result via the B<--prefix> option.
 
 The user name will be mangled by using a (bitwise) exclusive or (I<XOR>)
 operation on each character of the input arguments.
 
 To make sure, that the resulting data is an alphanumeric string, it is then
-encoded through base36, converted to lowercase, potentially further mangled in
-order to attain proper UNIX user name semantics, and printed to the standard
-output.
+encoded through base36, converted to lowercase, the prefix prepended if
+provided, potentially further mangled in order to attain proper UNIX user name
+semantics, and printed to the standard output.
+
+If an optional prefix is provided and it does not start with a digit, dot or
+dash character, no mangling is required and this step is hence skipped.
 
 =head2 ABOUT THE OTP
 
@@ -245,6 +268,10 @@ Print a brief help message and exits.
 =item B<--man>
 
 Prints the manual page and exits.
+
+=item B<--prefix>|B<-p>
+
+Specifies the prefix to prepend to the converted user name.
 
 =back
 
