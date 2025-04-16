@@ -43,9 +43,11 @@ my ($username, $otp) = @ARGV;
 pod2usage (-message => 'Expected user name as first argument.',
 	   -output => \*STDERR, -exitval => 3) if (not defined ($username));
 
+## no critic (RegularExpressions::RequireLineBoundaryMatching)
 pod2usage (-message => 'User name does not look legal.',
 	   -output => \*STDERR,
-	   -exitval => 4) unless $username =~ /^[a-zA-Z_][-a-zA-Z0-9_.]*$/;
+	   -exitval => 4) unless $username =~ /^[a-zA-Z_][-a-zA-Z0-9_.]*$/xs;
+## use critic
 
 pod2usage (-message => 'Expected OTP as second argument.',
 	   -output => \*STDERR, -exitval => 5) if (not defined ($otp));
@@ -109,7 +111,7 @@ my $ret = $base36num->to_base (36);
 $ret = lc ($ret);
 
 # Drop leading zeros.
-$ret =~ s/^0*(.*)$/$1/;
+$ret =~ s/^0*(.*)$/$1/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 
 # If the result starts with digits, transpose them with the first alphanumeric
 # or underscore character.
@@ -123,11 +125,11 @@ $ret =~ s/^0*(.*)$/$1/;
 # Also note that this could be simplified to just s/^([0-9]*)(.)(.*)$/$2$1$3/
 # because the base36 result cannot include either dashes, dots or underscores,
 # but it's good to be more generic to showcase what we're actually after.
-$ret =~ s/^([0-9]*)([.-]*)([a-z_])(.*)$/$3$1$2$4/;
+$ret =~ s/^([0-9]*)([.-]*)([a-z_])(.*)$/$3$1$2$4/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 
 # Lastly, if the result contains only digits, add an underscore to make it a
 # legit UNIX user name (hopefully).
-if ($ret =~ /^[0-9]+$/) {
+if ($ret =~ m/^[0-9]+$/sx) { ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 	$ret = '_' . $ret;
 }
 
