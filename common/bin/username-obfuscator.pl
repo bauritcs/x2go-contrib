@@ -81,8 +81,8 @@ elsif (length ($otp) < length ($username)) {
 }
 
 # Split input into individual characters for easy handling.
-my @username_chrs = split ('', $username);
-my @otp_chrs = split ('', $otp);
+my @username_chrs = split (//msx, $username);
+my @otp_chrs = split (//msx, $otp);
 
 my $base36num = Math::BigInt->new (0);
 
