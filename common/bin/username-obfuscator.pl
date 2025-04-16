@@ -46,7 +46,7 @@ pod2usage (-message => 'Expected user name as first argument.',
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 pod2usage (-message => 'User name does not look legal.',
 	   -output => \*STDERR,
-	   -exitval => 4) unless $username =~ /^[a-zA-Z_][-a-zA-Z0-9_.]*$/xs;
+	   -exitval => 4) unless $username =~ /^[[:alpha:]_][-[:alnum:]_.]*$/xs;
 ## use critic
 
 pod2usage (-message => 'Expected OTP as second argument.',
@@ -125,11 +125,11 @@ $ret =~ s/^0*(.*)$/$1/sx; ## no critic (RegularExpressions::RequireLineBoundaryM
 # Also note that this could be simplified to just s/^([0-9]*)(.)(.*)$/$2$1$3/
 # because the base36 result cannot include either dashes, dots or underscores,
 # but it's good to be more generic to showcase what we're actually after.
-$ret =~ s/^([0-9]*)([.-]*)([a-z_])(.*)$/$3$1$2$4/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
+$ret =~ s/^(\d*)([.-]*)([[:lower:]_])(.*)$/$3$1$2$4/sx; ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 
 # Lastly, if the result contains only digits, add an underscore to make it a
 # legit UNIX user name (hopefully).
-if ($ret =~ m/^[0-9]+$/sx) { ## no critic (RegularExpressions::RequireLineBoundaryMatching)
+if ($ret =~ m/^\d+$/sx) { ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 	$ret = '_' . $ret;
 }
 
