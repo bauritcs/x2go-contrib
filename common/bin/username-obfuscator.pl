@@ -31,11 +31,13 @@ Getopt::Long::Configure ('gnu_getopt', 'no_auto_abbrev');
 
 my $help = 0;
 my $man = 0;
+my $safe_otp = 0;
 my $prefix = undef;
 
 GetOptions ('help|?|h' => \$help,
 	    'man' => \$man,
-	    'prefix|p=s' => \$prefix) or pod2usage (-output => \*STDERR, -exitval => 2);
+	    'prefix|p=s' => \$prefix,
+	    'safe-otp|s' => \$safe_otp) or pod2usage (-output => \*STDERR, -exitval => 2);
 
 pod2usage (-output => \*STDERR, -exitval => 1) if $help;
 pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
@@ -70,25 +72,32 @@ if (length ($otp) > length ($username)) {
 	$otp = substr ($otp, 0, length ($username));
 }
 elsif (length ($otp) < length ($username)) {
-	print {*STDERR} 'OTP shorter than the user name! This is unsafe!' . "\n" .
-			'The OTP will be repeated as many times as necessary ' .
-			'to match the user name\'s length.' . "\n" .
-			'Please consider using an OTP that is at least as ' .
-			'long as the user name!' . "\n";
+	print {*STDERR} 'OTP shorter than the user name! This is unsafe!' . "\n";
 
-	# Fully repeat it as many times as necessary.
-	$otp = $otp x (length ($username) / length ($otp));
+	if (0 == $safe_otp) {
+		print {*STDERR} 'The OTP will be repeated as many times as ' .
+				'necessary to match the user name\'s ' .
+				'length.' . "\n" .
+				'Please consider using an OTP that is at ' .
+				'least as long as the user name!' . "\n";
 
-	# If the user name is still longer, copy as many characters from the
-	# beginning of the OTP to the end so that string sizes match up.
-	# Example: (brackets to show which part of the user name and OTP match
-	#           up in length)
-	#          [abc]defgh [xyz] will lead to the OTP being repeated twice,
-	#          so we now have [abcdef]gh [xyzxyz], but still need to
-	#          repeat two other characters to cover all user name
-	#          characters, so we end up with [abcdefgh] [xyzxyzxy].
-	my $rem = (length ($username) % length ($otp));
-	$otp = $otp . substr ($otp, 0, $rem);
+		# Fully repeat it as many times as necessary.
+		$otp = $otp x (length ($username) / length ($otp));
+
+		# If the user name is still longer, copy as many characters from the
+		# beginning of the OTP to the end so that string sizes match up.
+		# Example: (brackets to show which part of the user name and OTP match
+		#           up in length)
+		#          [abc]defgh [xyz] will lead to the OTP being repeated twice,
+		#          so we now have [abcdef]gh [xyzxyz], but still need to
+		#          repeat two other characters to cover all user name
+		#          characters, so we end up with [abcdefgh] [xyzxyzxy].
+		my $rem = (length ($username) % length ($otp));
+		$otp = $otp . substr ($otp, 0, $rem);
+	}
+	else {
+		exit (8);
+	}
 }
 
 # Split input into individual characters for easy handling.
@@ -170,7 +179,7 @@ username-obfuscator.pl - Obfuscates username via OTP input
 
 =item B<username-obfuscator.pl> B<--man>
 
-=item B<username-obfuscator.pl> [B<--prefix>|B<-p> I<PREFIX>] I<USERNAME> I<OTP>
+=item B<username-obfuscator.pl> [B<--prefix>|B<-p> I<PREFIX>] [B<--safe-otp>|B<-s>] I<USERNAME> I<OTP>
 
 =back
 
@@ -195,6 +204,9 @@ dash character, no mangling is required and this step is hence skipped.
 
 Internally, the provided OTP is mangled so that it matches the provided user
 name in length, if that is not already the case.
+
+If the B<--safe-otp> option has been provided, shorter OTPs lead to program
+termination.
 
 =over
 
@@ -225,7 +237,8 @@ Resulting OTP: I<'nam'>
 =item *
 
 If the I<OTP> is shorter than the provided I<USERNAME>, it is repeated as long
-as it takes to match the provided user name's length.
+as it takes to match the provided user name's length, unless the B<--safe-otp>
+option has been provided.
 
 This operation is risky, but the best thing we can do in this case. Avoid OTP
 lengths less than the length of the user name string at any cost.
@@ -272,6 +285,10 @@ Prints the manual page and exits.
 =item B<--prefix>|B<-p>
 
 Specifies the prefix to prepend to the converted user name.
+
+=item B<--safe-otp>|B<-s>
+
+Return an error if the OTP is too short to encrypt the whole user name string.
 
 =back
 
