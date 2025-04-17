@@ -29,6 +29,16 @@ use Math::BigInt;
 
 Getopt::Long::Configure ('gnu_getopt', 'no_auto_abbrev');
 
+use constant {
+	ERR_OPTS => 2,
+	ERR_MISSING_USERNAME => 3,
+	ERR_INVALID_USERNAME => 4,
+	ERR_MISSING_OTP => 5,
+	ERR_MISSING_PREFIX => 6,
+	ERR_INVALID_PREFIX => 7,
+	ERR_UNSAFE_OTP => 8
+};
+
 my $help = 0;
 my $man = 0;
 my $safe_otp = 0;
@@ -37,7 +47,7 @@ my $prefix = undef;
 GetOptions ('help|?|h' => \$help,
 	    'man' => \$man,
 	    'prefix|p=s' => \$prefix,
-	    'safe-otp|s' => \$safe_otp) or pod2usage (-output => \*STDERR, -exitval => 2);
+	    'safe-otp|s' => \$safe_otp) or pod2usage (-output => \*STDERR, -exitval => ERR_OPTS);
 
 pod2usage (-output => \*STDERR, -exitval => 1) if $help;
 pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
@@ -45,24 +55,24 @@ pod2usage (-verbose => 2, -output => \*STDERR, -exitval => 0) if $man;
 my ($username, $otp) = @ARGV;
 
 pod2usage (-message => 'Expected user name as first argument.',
-	   -output => \*STDERR, -exitval => 3) if (not defined ($username));
+	   -output => \*STDERR, -exitval => ERR_MISSING_USERNAME) if (not defined ($username));
 
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 pod2usage (-message => 'User name does not look legal.',
 	   -output => \*STDERR,
-	   -exitval => 4) unless $username =~ /^[[:alpha:]_][-[:alnum:]_.]*$/xs;
+	   -exitval => ERR_INVALID_USERNAME) unless $username =~ /^[[:alpha:]_][-[:alnum:]_.]*$/xs;
 ## use critic
 
 pod2usage (-message => 'Expected OTP as second argument.',
-	   -output => \*STDERR, -exitval => 5) if (not defined ($otp));
+	   -output => \*STDERR, -exitval => ERR_MISSING_OTP) if (not defined ($otp));
 
 pod2usage (-message => 'No prefix provided.',
-	   -output => \*STDERR, -exitval => 6) if ((defined ($prefix)) && ('' eq $prefix));
+	   -output => \*STDERR, -exitval => ERR_MISSING_PREFIX) if ((defined ($prefix)) && ('' eq $prefix));
 
 ## no critic (RegularExpressions::RequireLineBoundaryMatching)
 pod2usage (-message => 'Prefix does not look legal.',
 	   -output => \*STDERR,
-	   -exitval => 7) if ((defined ($prefix)) && ($prefix !~ /^[[:alnum:]_][-[:alnum:]_.]*$/xs));
+	   -exitval => ERR_INVALID_PREFIX) if ((defined ($prefix)) && ($prefix !~ /^[[:alnum:]_][-[:alnum:]_.]*$/xs));
 ## use critic
 
 # Make sure that OTP length is the same as the user name length.
@@ -96,7 +106,7 @@ elsif (length ($otp) < length ($username)) {
 		$otp = $otp . substr ($otp, 0, $rem);
 	}
 	else {
-		exit (8);
+		exit (ERR_UNSAFE_OTP);
 	}
 }
 
